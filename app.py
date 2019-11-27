@@ -173,9 +173,30 @@ class insertSong(Resource):
         conn = e.connect()
         query = conn.execute("select songs from counters")
         count = query.cursor.fetchall()[0][0]
+        query = conn.execute("select aid from albums where albums.alid="+alid)
+        aid = query.cursor.fetchall()[0][0]
         #Perform query and return JSON data
-        values = "(%s,%s,'%s','%s','%s')" %(count,alid,genre,musicProducer,name)
+        values = "(%s,%s,'%s','%s','%s',%s)" %(count,alid,genre,musicProducer,name,aid)
         query = conn.execute("insert into songs values"+values)
+
+class DeleteSong(Resource):
+    def get(self,sid):
+        result.clear()
+        conn = e.connect()
+        query = conn.execute("delete from songs where sid="+sid)
+
+class DeleteAlbum(Resource):
+    def get(self,alid):
+        result.clear()
+        conn = e.connect()
+        query = conn.execute("delete from albums where alid="+alid)
+
+class DeleteArtist(Resource):
+    def get(self,aid):
+        result.clear()
+        conn = e.connect()
+        query = conn.execute("delete from Artist where aid="+aid)
+
 api.add_resource(getSongSearch,'/getsongsearch/<string:name>')
 api.add_resource(getArtistSearch,'/getartistsearch/<string:name>')
 api.add_resource(getAlbumSearch,'/getalbumsearch/<string:name>')
@@ -185,7 +206,10 @@ api.add_resource(getAlbum,'/getAlbums')
 api.add_resource(getSong,'/getSongs')
 api.add_resource(getArtist,'/getArtists')
 api.add_resource(insertArtist,'/insertArtist/<string:name>/<string:country>/<string:nocopies>')
-api.add_resource(insertAlbum,'/insertAlbum/<string:aid>/<string:name>/<string:rlabel>/<string:nostream>')
+api.add_resource(insertAlbum,'/insertAlbum/<string:aid>/<string:name>/<string:recordLabel>/<string:nostream>')
 api.add_resource(insertSong,'/insertSong/<string:alid>/<string:genre>/<string:musicProducer>/<string:name>')
+api.add_resource(DeleteSong,'/deleteSong/<string:sid>')
+api.add_resource(DeleteAlbum,'/deleteAlbum/<string:alid>')
+api.add_resource(DeleteArtist,'/deleteArtist/<string:aid>')
 if __name__ == '__main__':
     app.run()
