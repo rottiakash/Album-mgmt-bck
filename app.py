@@ -154,6 +154,28 @@ class insertArtist(Resource):
         #Perform query and return JSON data
         values = "(%s,'%s',%s,'%s')" %(count,name,nocopies,country)
         query = conn.execute("insert into artist values"+values)
+
+class insertAlbum(Resource):
+    def get(self,aid,name,recordLabel,nostream):
+        result.clear()
+        #Connect to databse
+        conn = e.connect()
+        query = conn.execute("select albums from counters")
+        count = query.cursor.fetchall()[0][0]
+        #Perform query and return JSON data
+        values = "(%s,%s,'%s','%s','%s')" %(aid,count,name,recordLabel,nostream)
+        query = conn.execute("insert into albums values"+values)
+
+class insertSong(Resource):
+    def get(self,alid,genre,musicProducer,name):
+        result.clear()
+        #Connect to databse
+        conn = e.connect()
+        query = conn.execute("select songs from counters")
+        count = query.cursor.fetchall()[0][0]
+        #Perform query and return JSON data
+        values = "(%s,%s,'%s','%s','%s')" %(count,alid,genre,musicProducer,name)
+        query = conn.execute("insert into songs values"+values)
 api.add_resource(getSongSearch,'/getsongsearch/<string:name>')
 api.add_resource(getArtistSearch,'/getartistsearch/<string:name>')
 api.add_resource(getAlbumSearch,'/getalbumsearch/<string:name>')
@@ -163,5 +185,7 @@ api.add_resource(getAlbum,'/getAlbums')
 api.add_resource(getSong,'/getSongs')
 api.add_resource(getArtist,'/getArtists')
 api.add_resource(insertArtist,'/insertArtist/<string:name>/<string:country>/<string:nocopies>')
+api.add_resource(insertAlbum,'/insertAlbum/<string:aid>/<string:name>/<string:rlabel>/<string:nostream>')
+api.add_resource(insertSong,'/insertSong/<string:alid>/<string:genre>/<string:musicProducer>/<string:name>')
 if __name__ == '__main__':
     app.run()
