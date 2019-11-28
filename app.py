@@ -197,6 +197,45 @@ class DeleteArtist(Resource):
         conn = e.connect()
         query = conn.execute("delete from Artist where aid="+aid)
 
+class AddFav(Resource):
+    def get(self,email,sid):
+        result.clear()
+        conn = e.connect()
+        values = "('%s',%s)" %(email,sid)
+        query = conn.execute("insert into favourites values"+values)
+
+class GetFavs(Resource):
+    def get(self,email):
+        result.clear()
+        conn = e.connect()
+        query = conn.execute("select sid from favourites where emailid='"+email+"'")
+        for i in query.cursor.fetchall():
+            result.append(i[0])
+        return result
+
+class getSongFav(Resource):
+    def get(self,email):
+        result.clear()
+        #Connect to databse
+        conn = e.connect()
+        #Perform query and return JSON data
+        query = conn.execute("select sid,alname,genre,music_producer,mname from songs,albums where songs.alid = albums.alid and sid in(select sid from favourites where emailid='"+email+"')")
+        for i in query.cursor.fetchall():
+            dict = {'sid':i[0],
+                    'albumName':i[1],
+                    'genre':i[2],
+                    'musicProducer':i[3],
+                    'name':i[4],
+                    }
+            result.append(dict)
+        return result
+
+class DeleteFav(Resource):
+    def get(self,email,sid):
+        result.clear()
+        conn = e.connect()
+        query = conn.execute("delete from favourites where emailid='"+email+"' and sid="+sid)
+    
 api.add_resource(getSongSearch,'/getsongsearch/<string:name>')
 api.add_resource(getArtistSearch,'/getartistsearch/<string:name>')
 api.add_resource(getAlbumSearch,'/getalbumsearch/<string:name>')
@@ -211,5 +250,9 @@ api.add_resource(insertSong,'/insertSong/<string:alid>/<string:genre>/<string:mu
 api.add_resource(DeleteSong,'/deleteSong/<string:sid>')
 api.add_resource(DeleteAlbum,'/deleteAlbum/<string:alid>')
 api.add_resource(DeleteArtist,'/deleteArtist/<string:aid>')
+api.add_resource(AddFav,'/addFav/<string:email>/<string:sid>')
+api.add_resource(GetFavs,'/getFavs/<string:email>')
+api.add_resource(getSongFav,'/getsongsFav/<string:email>')
+api.add_resource(DeleteFav,'/delFav/<string:email>/<string:sid>')
 if __name__ == '__main__':
     app.run()
